@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Code Arena: Rust vs Go</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>CODE ARENA</h1>
+            <p class="subtitle">Rust vs Go</p>
+        </header>
+
+        <main>
+            <div class="arena">
+                <div class="warrior rust">
+                    <h2>Team Rust</h2>
+                    <div class="stats">
+                        <span id="rust-time">--</span> s
+                    </div>
+                </div>
+                
+                <div class="vs">VS</div>
+                
+                <div class="warrior go">
+                    <h2>Team Go</h2>
+                    <div class="stats">
+                        <span id="go-time">--</span> s
+                    </div>
+                </div>
+            </div>
+
+            <div class="controls">
+                <button id="fight-btn" onclick="startFight()">FIGHT!</button>
+            </div>
+
+            <div id="results" class="results hidden">
+                <h2 id="winner-text"></h2>
+                <div class="shame-corner">
+                    <h3>Disassembly of Shame</h3>
+                    <pre id="shame-content"></pre>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        async function startFight() {
+            const btn = document.getElementById('fight-btn');
+            const resultsDiv = document.getElementById('results');
+            const rustTime = document.getElementById('rust-time');
+            const goTime = document.getElementById('go-time');
+            
+            btn.disabled = true;
+            btn.innerText = "FIGHTING...";
+            resultsDiv.classList.add('hidden');
+            rustTime.innerText = "--";
+            goTime.innerText = "--";
+
+            try {
+                const response = await fetch('/fight', { method: 'POST' });
+                const data = await response.json();
+
+                if (data.error) {
+                    alert("Error: " + data.error);
+                    return;
+                }
+
+                rustTime.innerText = data.rust_time.toFixed(6);
+                goTime.innerText = data.go_time.toFixed(6);
+                
+                document.getElementById('winner-text').innerText = data.winner + " WINS!";
+                document.getElementById('shame-content').innerText = data.shame;
+                
+                resultsDiv.classList.remove('hidden');
+            } catch (e) {
+                alert("Fight failed: " + e);
+            } finally {
+                btn.disabled = false;
+                btn.innerText = "FIGHT!";
+            }
+        }
+    </script>
+</body>
+</html>

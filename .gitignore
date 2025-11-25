@@ -1,0 +1,6 @@
+target/
+*.exe
+*.bin
+__pycache__
+.venv/
+shame.txt
